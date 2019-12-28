@@ -15,7 +15,7 @@ public class ChessMatch {
 		initialSetup();
 	}
 
-	public ChessPiece[][] getPieces() {
+	public ChessPiece[][] getPieces() {  //retorna a matriz de pecas
 		ChessPiece[][] mat = new ChessPiece[board.getRows()][board.getColumns()];
 		for (int i = 0; i < board.getRows(); i++) {
 			for (int j = 0; j < board.getColumns(); j++) {
@@ -25,7 +25,7 @@ public class ChessMatch {
 		return mat;
 	}
 	
-	public ChessPiece performChessMove(ChessPosition sourcePosition, ChessPosition targetPosition) {
+	public ChessPiece performChessMove(ChessPosition sourcePosition, ChessPosition targetPosition) { //converte a posicao da matriz para posicao xadrez e move as pecas
 		Position source = sourcePosition.toPosition();
 		Position target = targetPosition.toPosition();
 		validateSourcePosition(source);
@@ -33,20 +33,20 @@ public class ChessMatch {
 		return (ChessPiece) capturedPiece;
 	}
 	
-	private Piece makeMove(Position source, Position target) {
+	private Piece makeMove(Position source, Position target) {  // movimenta a peca de uma posicao de origem para a final e captura caso haja
 		Piece p = board.removePiece(source);
 		Piece capturedPiece = board.removePiece(target);
 		board.placePiece(p, target);
 		return capturedPiece;
 	}
 	
-	private void validateSourcePosition(Position position) {
+	private void validateSourcePosition(Position position) {  //checa se há peca na posicao de origem
 		if(!board.thereIsAPiece(position)) {
-			throw new ChessException("Não existe peça na posição de origem");
+			throw new ChessException("Nao existe peca na posicao de origem");
 		}
 	}
 
-	private void placeNewPiece(char column, int row, ChessPiece piece) {
+	private void placeNewPiece(char column, int row, ChessPiece piece) {     //adicionando peca ao tabuleiro com parametros de xadrez
 		board.placePiece(piece, new ChessPosition(column, row).toPosition());
 	}
 
