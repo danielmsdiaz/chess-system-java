@@ -9,13 +9,33 @@ import chess.pieces.Rook;
 public class ChessMatch {
 
 	private Board board;
+	private int turn;
+	private Color currentPlayer;
 
 	public ChessMatch() {
 		board = new Board(8, 8);
+		turn = 1;
+		currentPlayer = Color.WHITE;
 		initialSetup();
 	}
 
-	public ChessPiece[][] getPieces() {  //retorna a matriz de pecas
+	public int getTurn() {
+		return turn;
+	}
+
+	public void setTurn(int turn) {
+		this.turn = turn;
+	}
+
+	public Color getCurrentPlayer() {
+		return currentPlayer;
+	}
+
+	public void setCurrentPlayer(Color currentPlayer) {
+		this.currentPlayer = currentPlayer;
+	}
+
+	public ChessPiece[][] getPieces() { // retorna a matriz de pecas
 		ChessPiece[][] mat = new ChessPiece[board.getRows()][board.getColumns()];
 		for (int i = 0; i < board.getRows(); i++) {
 			for (int j = 0; j < board.getColumns(); j++) {
@@ -24,49 +44,70 @@ public class ChessMatch {
 		}
 		return mat;
 	}
-	
-	public boolean[][] possibleMoves(ChessPosition sourcePosition){
+
+	public boolean[][] possibleMoves(ChessPosition sourcePosition) {
 		Position position = sourcePosition.toPosition();
 		validateSourcePosition(position);
 		return board.piece(position).possibleMoves();
 	}
-	
-	
-	public ChessPiece performChessMove(ChessPosition sourcePosition, ChessPosition targetPosition) { //converte a posicao da matriz para posicao xadrez e move as pecas
+
+	public ChessPiece performChessMove(ChessPosition sourcePosition, ChessPosition targetPosition) { // converte a
+																										// posicao da
+																										// matriz para
+																										// posicao
+																										// xadrez e move
+																										// as pecas
 		Position source = sourcePosition.toPosition();
 		Position target = targetPosition.toPosition();
 		validateSourcePosition(source);
 		validateTargetPosition(source, target);
 		Piece capturedPiece = makeMove(source, target);
+		nextTurn();
 		return (ChessPiece) capturedPiece;
 	}
-	
-	private Piece makeMove(Position source, Position target) {  // movimenta a peca de uma posicao de origem para a final e captura caso haja
+
+	private Piece makeMove(Position source, Position target) { // movimenta a peca de uma posicao de origem para a final
+																// e captura caso haja
 		Piece p = board.removePiece(source);
 		Piece capturedPiece = board.removePiece(target);
 		board.placePiece(p, target);
 		return capturedPiece;
 	}
-	
-	private void validateSourcePosition(Position position) {  //checa se há peca na posicao de origem
-		if(!board.thereIsAPiece(position)) {
+
+	private void validateSourcePosition(Position position) { // checa se há peca na posicao de origem
+		if (!board.thereIsAPiece(position)) {
 			throw new ChessException("Nao existe peca na posicao de origem");
 		}
-		if(!board.piece(position).isThereAnyPossibleMove()) {
+		
+		if(currentPlayer != ((ChessPiece) board.piece(position)).getColor()) {
+			throw new ChessException("A peca escolhida nao e sua");
+		}
+		
+		if (!board.piece(position).isThereAnyPossibleMove()) {
 			throw new ChessException("Nao ha movimentos possiveis para a peca escolhida");
 		}
 	}
-	
+
 	private void validateTargetPosition(Position source, Position target) {
-		if(!board.piece(source).possibleMove(target)) {
+		if (!board.piece(source).possibleMove(target)) {
 			throw new ChessException("A peca escolhida nao pode se mover para posicao de destino");
 		}
 	}
-
-	private void placeNewPiece(char column, int row, ChessPiece piece) {     //adicionando peca ao tabuleiro com parametros de xadrez
-		board.placePiece(piece, new ChessPosition(column, row).toPosition());
+	
+	private void nextTurn() {
+		turn++;
+		if(currentPlayer == Color.WHITE) {
+			currentPlayer = Color.BLACK;
+		}
+		else if(currentPlayer == Color.BLACK) {
+			currentPlayer = Color.WHITE;
+		}
 	}
 
+	private void placeNewPiece(char column, int row, ChessPiece piece) { // adicionando peca ao tabuleiro com parametros
+																			// de xadrez
+		board.placePiece(piece, new ChessPosition(column, row).toPosition());
+	}
 
 	private void initialSetup() {
 
@@ -85,6 +126,5 @@ public class ChessMatch {
 		placeNewPiece('d', 8, new King(board, Color.BLACK));
 
 	}
-	
 
 }
