@@ -1,5 +1,8 @@
 package chess;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import boardgame.Board;
 import boardgame.Piece;
 import boardgame.Position;
@@ -11,6 +14,8 @@ public class ChessMatch {
 	private Board board;
 	private int turn;
 	private Color currentPlayer;
+	private List<Piece> piecesOnTheBoard = new ArrayList<>();;
+	private List<Piece> capturedPieces = new ArrayList<>();
 
 	public ChessMatch() {
 		board = new Board(8, 8);
@@ -71,6 +76,10 @@ public class ChessMatch {
 		Piece p = board.removePiece(source);
 		Piece capturedPiece = board.removePiece(target);
 		board.placePiece(p, target);
+		if (capturedPiece != null) {
+			piecesOnTheBoard.remove(capturedPiece);
+			capturedPieces.add(capturedPiece);
+		}
 		return capturedPiece;
 	}
 
@@ -78,11 +87,11 @@ public class ChessMatch {
 		if (!board.thereIsAPiece(position)) {
 			throw new ChessException("Nao existe peca na posicao de origem");
 		}
-		
-		if(currentPlayer != ((ChessPiece) board.piece(position)).getColor()) {
+
+		if (currentPlayer != ((ChessPiece) board.piece(position)).getColor()) {
 			throw new ChessException("A peca escolhida nao e sua");
 		}
-		
+
 		if (!board.piece(position).isThereAnyPossibleMove()) {
 			throw new ChessException("Nao ha movimentos possiveis para a peca escolhida");
 		}
@@ -93,13 +102,12 @@ public class ChessMatch {
 			throw new ChessException("A peca escolhida nao pode se mover para posicao de destino");
 		}
 	}
-	
+
 	private void nextTurn() {
 		turn++;
-		if(currentPlayer == Color.WHITE) {
+		if (currentPlayer == Color.WHITE) {
 			currentPlayer = Color.BLACK;
-		}
-		else if(currentPlayer == Color.BLACK) {
+		} else if (currentPlayer == Color.BLACK) {
 			currentPlayer = Color.WHITE;
 		}
 	}
@@ -107,6 +115,7 @@ public class ChessMatch {
 	private void placeNewPiece(char column, int row, ChessPiece piece) { // adicionando peca ao tabuleiro com parametros
 																			// de xadrez
 		board.placePiece(piece, new ChessPosition(column, row).toPosition());
+		piecesOnTheBoard.add(piece);
 	}
 
 	private void initialSetup() {
